@@ -3,8 +3,8 @@ import psycopg2
 from connector import AbstractConnector
 
 
-class PostgresqlConnector(AbstractConnector):
-    def __init__(self, host="localhost", port=5432, database="", username="", password=""):
+class PostgreSQLConnector(AbstractConnector):
+    def __init__(self, host="127.0.0.1", port=5432, database="", username="", password=""):
         super().__init__(host, port, database, username, password)
         self.host = host
         self.port = port
