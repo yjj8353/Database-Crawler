@@ -1,8 +1,10 @@
+from crawler import AbstractCrawler
+
 from query import postgresql as pq
 
-class PostgreSQLCrawler:
+class PostgreSQLCrawler(AbstractCrawler):
     def __init__(self, connector, schemas=None):
-        self.connector = connector
+        super().__init__(connector)
         self.schemas = schemas
 
     def crawling(self):

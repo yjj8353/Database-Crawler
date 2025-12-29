@@ -22,9 +22,9 @@ class AbstractConnector(metaclass=ABCMeta):
     def connect(self):
         pass
 
-    @abstractmethod
     def disconnect(self):
-        pass
+        if self.conn:
+            self.conn.close()
 
     def cursor(self):
         return self.conn.cursor()

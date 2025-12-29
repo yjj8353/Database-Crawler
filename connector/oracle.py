@@ -28,7 +28,3 @@ class OracleConnector(AbstractConnector):
         except cx_Oracle.DatabaseError as e:
             print(f"Oracle 데이터베이스 연결 오류: {e}")
             return None
-
-    def disconnect(self):
-        if self.conn:
-            self.conn.close()

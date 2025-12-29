@@ -23,7 +23,3 @@ class MysqlConnector(AbstractConnector):
         except Error as e:
             print(f"MySQL 데이터베이스 연결 중 오류 발생: {e}")
             return None
-
-    def disconnect(self):
-        if self.conn:
-            self.conn.close()

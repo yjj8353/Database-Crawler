@@ -15,7 +15,7 @@ def select_columns_query() -> str:
                  , datetime_precision 		-- 타임스탬프의 밀리초 정밀도
               FROM information_schema.columns
              WHERE table_schema = %s
-               AND table_name = %s
+               AND table_name   = %s
              ORDER BY ordinal_position;
             """
 
@@ -29,9 +29,10 @@ def select_pk_query() -> str:
                AND tc.constraint_schema = kcu.constraint_schema
              WHERE tc.constraint_type = 'PRIMARY KEY'
                AND tc.table_schema = %s
-               AND tc.table_name = %s
+               AND tc.table_name   = %s
              ORDER BY kcu.ordinal_position;
             """
+
 
 def select_fk_query() -> str:
     return """
@@ -54,6 +55,6 @@ def select_fk_query() -> str:
                AND rc.unique_constraint_schema = ccu.constraint_schema
              WHERE tc.constraint_type = 'FOREIGN KEY'
                AND tc.table_schema = %s
-               AND tc.table_name = %s
+               AND tc.table_name   = %s
              ORDER BY tc.constraint_name, kcu.ordinal_position;
             """
