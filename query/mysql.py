@@ -1,4 +1,4 @@
-def select_columns_query_mysql() -> str:
+def select_columns_query() -> str:
     return """
             SELECT TABLE_NAME                                        -- 테이블 명
                  , COLUMN_NAME                                       -- 컬럼 명
@@ -16,13 +16,12 @@ def select_columns_query_mysql() -> str:
                  , COLLATION_NAME                                    -- 문자열 정렬 규칙
                  , DATETIME_PRECISION                                -- 타임스탬프 정밀도
               FROM information_schema.COLUMNS
-             WHERE TABLE_SCHEMA = %s
-               AND TABLE_NAME   = %s
+             WHERE TABLE_NAME = %s
              ORDER BY ORDINAL_POSITION;
             """
 
 
-def select_pk_query_mysql() -> str:
+def select_pk_query() -> str:
     return """
             SELECT kcu.COLUMN_NAME
               FROM information_schema.TABLE_CONSTRAINTS tc
@@ -31,13 +30,12 @@ def select_pk_query_mysql() -> str:
                AND tc.TABLE_SCHEMA    = kcu.TABLE_SCHEMA
                AND tc.TABLE_NAME      = kcu.TABLE_NAME
              WHERE tc.CONSTRAINT_TYPE = 'PRIMARY KEY'
-               AND tc.TABLE_SCHEMA    = %s
                AND tc.TABLE_NAME      = %s
              ORDER BY kcu.ORDINAL_POSITION;
             """
 
 
-def select_fk_query_mysql() -> str:
+def select_fk_query() -> str:
     return """
             SELECT kcu.COLUMN_NAME                                     -- FK 컬럼 명 (로컬)
                  , kcu.REFERENCED_TABLE_SCHEMA AS foreign_table_schema -- 참조 테이블 스키마 명
@@ -55,7 +53,6 @@ def select_fk_query_mysql() -> str:
                 ON rc.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
                AND rc.CONSTRAINT_SCHEMA = tc.TABLE_SCHEMA
              WHERE tc.CONSTRAINT_TYPE = 'FOREIGN KEY'
-               AND tc.TABLE_SCHEMA    = %s
                AND tc.TABLE_NAME      = %s
              ORDER BY tc.CONSTRAINT_NAME, kcu.ORDINAL_POSITION;
             """

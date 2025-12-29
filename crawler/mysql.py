@@ -1,77 +1,53 @@
 from crawler import AbstractCrawler
 
-from query import postgresql as pq
+from query import mysql as my
 
-class PostgreSQLCrawler(AbstractCrawler):
-    def __init__(self, connector, schemas=None):
+
+class MySQLCrawler(AbstractCrawler):
+    def __init__(self, connector):
         super().__init__(connector)
-        self.schemas = schemas
 
     def crawling(self):
+        tables = self.get_tables()
+        print(f"Tables: {tables}")
 
-        # 스키마 조회 (지정된 스키마가 없으면, 전체 스키마를 조회함)
-        if self.schemas is None:
-            self.schemas = self.get_schemas()
+        for table in tables:
+            table_info = self.get_table_info(table)
+            print(f"Info: {table_info}")
 
-        # 스키마별 테이블 조회
-        for schema in self.schemas:
-            tables = self.get_tables(schema)
-            print(f"Schema: {schema}, Tables: {tables}")
-
-            for table in tables:
-                table_info = self.get_table_info(schema, table)
-                print(f"Table: {schema}.{table}, Info: {table_info}")
-
-    def get_schemas(self):
+    def get_tables(self):
         query = """
-            SELECT schema_name
-              FROM information_schema.schemata
-             ORDER BY schema_name;
+            SELECT TABLE_NAME
+              FROM information_schema.TABLES
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_TYPE = 'BASE TABLE'
+             ORDER BY TABLE_NAME;
         """
-        conn = self.connector.connect()
 
+        conn = self.connector.connect()
         try:
             with conn.cursor() as cur:
                 cur.execute(query)
-                rows = cur.fetchall()
-                schemas = [row[0] for row in rows]
-        finally:
-            conn.close()
-        return schemas
-
-    # 특정 스키마의 전체 테이블 정보 조회
-    def get_tables(self, schema):
-        query = """
-            SELECT table_name
-              FROM information_schema.tables
-             WHERE table_schema = %s
-             ORDER BY table_name;
-        """
-
-        conn = self.connector.connect()
-        try:
-            with conn.cursor() as cur:
-                cur.execute(query, (schema, ))
                 rows = cur.fetchall()
                 tables = [row[0] for row in rows]
         finally:
             conn.close()
         return tables
 
-    def get_table_info(self, schema, table):
-        print(f"Schema: {schema}, Table: {table}")
+    def get_table_info(self, table):
+        print(f"Table: {table}")
         columns = []
         pks = []
         fks = []
 
-        select_col_query = pq.select_columns_query()
-        select_pk_query = pq.select_pk_query()
-        select_fk_query = pq.select_fk_query()
+        select_col_query = my.select_columns_query()
+        select_pk_query = my.select_pk_query()
+        select_fk_query = my.select_fk_query()
 
         conn = self.connector.connect()
         try:
             with conn.cursor() as cur:
-                cur.execute(select_col_query, (schema, table))
+                cur.execute(select_col_query, (table, ))
                 rows = cur.fetchall()
                 for row in rows:
                     col = {
@@ -92,13 +68,13 @@ class PostgreSQLCrawler(AbstractCrawler):
                     columns.append(col)
 
                 # PK 정보 조회
-                cur.execute(select_pk_query, (schema, table))
+                cur.execute(select_pk_query, (table, ))
                 rows = cur.fetchall()
                 for row in rows:
                     pks.append(row[0])
 
                 # FK 정보 조회
-                cur.execute(select_fk_query, (schema, table))
+                cur.execute(select_fk_query, (table, ))
                 rows = cur.fetchall()
                 for row in rows:
                     fk = {
