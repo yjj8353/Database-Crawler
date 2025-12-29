@@ -28,8 +28,8 @@ def select_pk_query() -> str:
                 ON tc.constraint_name = kcu.constraint_name
                AND tc.constraint_schema = kcu.constraint_schema
              WHERE tc.constraint_type = 'PRIMARY KEY'
-               AND tc.table_schema = %s
-               AND tc.table_name   = %s
+               AND tc.table_schema    = %s
+               AND tc.table_name      = %s
              ORDER BY kcu.ordinal_position;
             """
 
@@ -54,7 +54,7 @@ def select_fk_query() -> str:
                 ON rc.unique_constraint_name = ccu.constraint_name
                AND rc.unique_constraint_schema = ccu.constraint_schema
              WHERE tc.constraint_type = 'FOREIGN KEY'
-               AND tc.table_schema = %s
-               AND tc.table_name   = %s
+               AND tc.table_schema    = %s
+               AND tc.table_name      = %s
              ORDER BY tc.constraint_name, kcu.ordinal_position;
             """

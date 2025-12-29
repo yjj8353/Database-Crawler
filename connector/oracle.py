@@ -1,4 +1,4 @@
-import cx_Oracle
+import oracledb
 
 from connector import AbstractConnector
 
@@ -14,17 +14,17 @@ class OracleConnector(AbstractConnector):
 
     def connect(self):
         if self.sid:
-            dsn = cx_Oracle.makedsn(self.host, self.port, sid=self.sid)
+            dsn = oracledb.makedsn(self.host, self.port, sid=self.sid)
         else:
-            dsn = cx_Oracle.makedsn(self.host, self.port, service_name=self.service_name)
+            dsn = oracledb.makedsn(self.host, self.port, service_name=self.service_name)
 
         try:
-            self.conn = cx_Oracle.connect(
+            self.conn = oracledb.connect(
                 user=self.username,
                 password=self.password,
                 dsn=dsn
             )
             return self.conn
-        except cx_Oracle.DatabaseError as e:
+        except oracledb.DatabaseError as e:
             print(f"Oracle 데이터베이스 연결 오류: {e}")
             return None
