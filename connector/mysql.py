@@ -5,8 +5,8 @@ from connector import AbstractConnector
 
 
 class MysqlConnector(AbstractConnector):
-    def __init__(self, host="localhost", port=3306, database="", username="", password=""):
-        super().__init__(host, port, database, username, password)
+    def __init__(self, database, username, password, host="127.0.0.1", port=3306):
+        super().__init__(database, username, password, host, port)
 
     def connect(self):
         try:

@@ -23,9 +23,9 @@ def connect():
     try:
         connector = None
         if vendor == "postgresql":
-            connector = PostgreSQLConnector(host, int(port), database, username, password)
+            connector = PostgreSQLConnector(database, username, password, host, int(port))
         elif vendor == "mysql":
-            connector = MysqlConnector(host, int(port), database, username, password)
+            connector = MysqlConnector(database, username, password, host, int(port))
 
         if connector is not None:
             conn = connector.connect()

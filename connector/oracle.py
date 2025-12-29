@@ -7,10 +7,8 @@ class OracleConnector(AbstractConnector):
     service_name: str = "orcl"
     sid: str = None
 
-    def __init__(self, host="localhost", port=1521, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.host = host
-        self.port = port
+    def __init__(self, database, username, password, host="localhost", port=1521):
+        super().__init__(database, username, password, host, port)
 
     def connect(self):
         if self.sid:
