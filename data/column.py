@@ -15,6 +15,15 @@ class Column:
     __is_generated: bool
     __collation_name: Optional[str]
     __datetime_precision: Optional[int]
+    __is_pk: bool
+    __is_fk: bool
+    __foreign_table_schema: Optional[str]
+    __foreign_table_name: Optional[str]
+    __foreign_column_name: Optional[str]
+    __update_rule: Optional[str]
+    __delete_rule: Optional[str]
+    __pk_constraint_name: Optional[str]
+    __fk_constraint_name: Optional[str]
 
     def __init__(self, row: dict):
         self.__column_name = row["COLUMN_NAME"]
@@ -30,3 +39,13 @@ class Column:
         self.__is_generated = row["IS_GENERATED"]
         self.__collation_name = row["COLLATION_NAME"]
         self.__datetime_precision = row["DATETIME_PRECISION"]
+        self.__is_pk = row["IS_PK"]
+        self.__is_fk = row["IS_FK"]
+        self.__foreign_table_schema = row["FOREIGN_TABLE_SCHEMA"]
+        self.__foreign_table_name = row["FOREIGN_TABLE_NAME"]
+        self.__foreign_column_name = row["FOREIGN_COLUMN_NAME"]
+        self.__update_rule = row["UPDATE_RULE"]
+        self.__delete_rule = row["DELETE_RULE"]
+        self.__pk_constraint_name = row["PK_CONSTRAINT_NAME"]
+        self.__fk_constraint_name = row["FK_CONSTRAINT_NAME"]
+
