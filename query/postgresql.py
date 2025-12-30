@@ -90,7 +90,7 @@ def select_columns_info_query() -> str:
            WHERE TC.TABLE_SCHEMA = %s
              AND TC.TABLE_NAME   = %s
         )
-        SELECT C.COLUMN_NAME,
+        SELECT C.COLUMN_NAME AS "COLUMN_NAME"
              , (SELECT d.description 
                   FROM pg_catalog.pg_description d
                  INNER JOIN pg_catalog.pg_attribute a ON a.attrelid = d.objoid AND a.attnum = d.objsubid
@@ -99,29 +99,29 @@ def select_columns_info_query() -> str:
                  WHERE n.nspname = C.TABLE_SCHEMA 
                    AND t.relname = C.TABLE_NAME 
                    AND a.attname = C.COLUMN_NAME
-               ) AS COLUMN_COMMENT
-             , C.ORDINAL_POSITION
-             , C.DATA_TYPE
-             , C.UDT_NAME
-             , C.CHARACTER_MAXIMUM_LENGTH
-             , C.NUMERIC_PRECISION
-             , C.IS_NULLABLE
-             , C.COLUMN_DEFAULT
+               ) AS "COLUMN_COMMENT"
+             , C.ORDINAL_POSITION AS "ORDINAL_POSITION"
+             , C.DATA_TYPE AS "DATA_TYPE"
+             , C.UDT_NAME AS "UDT_NAME"
+             , C.CHARACTER_MAXIMUM_LENGTH AS "CHARACTER_MAXIMUM_LENGTH"
+             , C.NUMERIC_PRECISION AS "NUMERIC_PRECISION"
+             , C.IS_NULLABLE AS "IS_NULLABLE"
+             , C.COLUMN_DEFAULT AS "COLUMN_DEFAULT"
              , CASE WHEN C.IS_IDENTITY = 'YES' OR C.COLUMN_DEFAULT LIKE 'nextval(%%' THEN 'T' 
                     ELSE 'F' 
-                END AS IS_IDENTITY
-             , CASE WHEN C.IS_GENERATED = 'ALWAYS' THEN 'T' ELSE 'F' END AS IS_GENERATED
-             , C.COLLATION_NAME
-             , C.DATETIME_PRECISION
-             , MAX(CASE WHEN TC.CONSTRAINT_TYPE = 'PRIMARY KEY' THEN 'T' ELSE 'F' END) AS IS_PK
-             , MAX(CASE WHEN TC.CONSTRAINT_TYPE = 'FOREIGN KEY' THEN 'T' ELSE 'F' END) AS IS_FK
-             , MAX(TC.REFERENCED_TABLE_SCHEMA) AS FOREIGN_TABLE_SCHEMA
-             , MAX(TC.REFERENCED_TABLE_NAME) AS FOREIGN_TABLE_NAME
-             , MAX(TC.REFERENCED_COLUMN_NAME) AS FOREIGN_COLUMN_NAME
-             , MAX(TC.UPDATE_RULE) AS UPDATE_RULE
-             , MAX(TC.DELETE_RULE) AS DELETE_RULE
-             , MAX(TC.FK_CONSTRAINT_NAME) AS FK_CONSTRAINT_NAME
-             , MAX(TC.PK_CONSTRAINT_NAME) AS PK_CONSTRAINT_NAME
+                END AS "IS_IDENTITY"
+             , CASE WHEN C.IS_GENERATED = 'ALWAYS' THEN 'T' ELSE 'F' END AS "IS_GENERATED"
+             , C.COLLATION_NAME AS "COLLATION_NAME"
+             , C.DATETIME_PRECISION AS "DATETIME_PRECISION"
+             , MAX(CASE WHEN TC.CONSTRAINT_TYPE = 'PRIMARY KEY' THEN 'T' ELSE 'F' END) AS "IS_PK"
+             , MAX(CASE WHEN TC.CONSTRAINT_TYPE = 'FOREIGN KEY' THEN 'T' ELSE 'F' END) AS "IS_FK"
+             , MAX(TC.REFERENCED_TABLE_SCHEMA) AS "FOREIGN_TABLE_SCHEMA"
+             , MAX(TC.REFERENCED_TABLE_NAME) AS "FOREIGN_TABLE_NAME"
+             , MAX(TC.REFERENCED_COLUMN_NAME) AS "FOREIGN_COLUMN_NAME"
+             , MAX(TC.UPDATE_RULE) AS "UPDATE_RULE"
+             , MAX(TC.DELETE_RULE) AS "DELETE_RULE"
+             , MAX(TC.FK_CONSTRAINT_NAME) AS "FK_CONSTRAINT_NAME"
+             , MAX(TC.PK_CONSTRAINT_NAME) AS "PK_CONSTRAINT_NAME"
         FROM information_schema.COLUMNS C
         LEFT JOIN TABLE_CONSTRAINTS TC 
           ON C.COLUMN_NAME = TC.COLUMN_NAME

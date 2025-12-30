@@ -1,4 +1,6 @@
 from crawler import AbstractCrawler
+from data.column import Column
+from data.table import Table
 
 from query import postgresql as pq
 
@@ -42,75 +44,42 @@ class PostgreSQLCrawler(AbstractCrawler):
     # 특정 스키마의 전체 테이블 정보 조회
     def get_tables(self, schema):
         query = """
-            SELECT table_name
-              FROM information_schema.tables
-             WHERE table_schema = %s
-             ORDER BY table_name;
+            SELECT t.TABLE_NAME as "TABLE_NAME"
+                 , obj_description(c.oid, 'pg_class') AS "TABLE_COMMENT"
+              FROM information_schema.tables t
+             INNER JOIN pg_catalog.pg_class c ON c.relname = t.table_name
+             INNER JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace AND n.nspname = t.table_schema
+             WHERE t.table_schema = %s
+               AND t.table_type   = 'BASE TABLE' -- View 제외
+             ORDER BY t.table_name;
         """
 
+        tables: list[Table] = []
         conn = self.connector.connect()
         try:
             with conn.cursor() as cur:
                 cur.execute(query, (schema, ))
                 rows = cur.fetchall()
-                tables = [row[0] for row in rows]
+                for row in rows:
+                    table = Table(row)
+                    tables.append(table)
         finally:
             conn.close()
+
         return tables
 
     def get_table_info(self, schema, table):
         print(f"Schema: {schema}, Table: {table}")
-        columns = []
-        pks = []
-        fks = []
-
-        select_col_query = pq.select_columns_query()
-        select_pk_query = pq.select_pk_query()
-        select_fk_query = pq.select_fk_query()
+        columns: list[Column] = []
 
         conn = self.connector.connect()
         try:
             with conn.cursor() as cur:
-                cur.execute(select_col_query, (schema, table))
+                cur.execute(pq.select_columns_info_query(), (schema, table.table_name, schema, table.table_name))
                 rows = cur.fetchall()
                 for row in rows:
-                    col = {
-                        "table_name": row[0],
-                        "column_name": row[1],
-                        "ordinal_position": row[2],
-                        "data_type": row[3],
-                        "udt_name": row[4],
-                        "character_maximum_length": row[5],
-                        "numeric_precision": row[6],
-                        "is_nullable": row[7],
-                        "column_default": row[8],
-                        "is_identity": row[9],
-                        "is_generated": row[10],
-                        "collation_name": row[11],
-                        "datetime_precision": row[12]
-                    }
+                    col = Column(row)
                     columns.append(col)
-
-                # PK 정보 조회
-                cur.execute(select_pk_query, (schema, table))
-                rows = cur.fetchall()
-                for row in rows:
-                    pks.append(row[0])
-
-                # FK 정보 조회
-                cur.execute(select_fk_query, (schema, table))
-                rows = cur.fetchall()
-                for row in rows:
-                    fk = {
-                        "column_name": row[0],
-                        "foreign_table_schema": row[1],
-                        "foreign_table_name": row[2],
-                        "foreign_column_name": row[3],
-                        "update_rule": row[4],
-                        "delete_rule": row[5],
-                        "constraint_name": row[6]
-                    }
-                    fks.append(fk)
 
         except Exception as e:
             print(f"테이블 정보 조회 오류: {e}")
@@ -118,8 +87,4 @@ class PostgreSQLCrawler(AbstractCrawler):
         finally:
             conn.close()
 
-        return {
-            "columns": columns,
-            "primary_keys": pks,
-            "foreign_keys": fks
-        }
+        return columns

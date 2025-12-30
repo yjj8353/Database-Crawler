@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2.extras import DictCursor
 
 from connector import AbstractConnector
 
@@ -14,7 +15,8 @@ class PostgreSQLConnector(AbstractConnector):
                 port = self.port,
                 dbname = self.database,
                 user = self.username,
-                password = self.password
+                password = self.password,
+                cursor_factory=DictCursor
             )
             return self.conn
 

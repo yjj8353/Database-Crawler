@@ -44,7 +44,7 @@ class MySQLCrawler(AbstractCrawler):
 
     def get_table_info(self, table):
         print(f"Table: {table.table_name}")
-        columns = []
+        columns: list[Column] = []
 
         conn = self.connector.connect()
         try:
