@@ -31,7 +31,7 @@ class MySQLCrawler(AbstractCrawler):
         conn = self.connector.connect()
         try:
             tables: list[Table] = []
-            with conn.cursor() as cur:
+            with conn.cursor(dictionary = True) as cur:
                 cur.execute(query)
                 rows = cur.fetchall()
                 for row in rows:
@@ -48,8 +48,8 @@ class MySQLCrawler(AbstractCrawler):
 
         conn = self.connector.connect()
         try:
-            with conn.cursor() as cur:
-                cur.execute(my.select_columns_info_query(), (table, ))
+            with conn.cursor(dictionary = True) as cur:
+                cur.execute(my.select_columns_info_query(), (self.schema, table.table_name, self.schema, table.table_name))
                 rows = cur.fetchall()
                 for row in rows:
                     column = Column(row)
