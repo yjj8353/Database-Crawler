@@ -5,11 +5,13 @@ from connector import AbstractConnector
 
 
 class OracleConnector(AbstractConnector):
-    service_name: str = "orcl"
-    sid: Optional[str] = None
+    service_name: str
+    sid: Optional[str]
 
-    def __init__(self, database, username, password, host="localhost", port=1521):
+    def __init__(self, database, username, password, host="127.0.0.1", port=1521, service_name="ORCL", sid=None):
         super().__init__(database, username, password, host, port)
+        self.service_name = service_name
+        self.sid = sid
 
     def connect(self):
         if self.sid:
@@ -23,6 +25,7 @@ class OracleConnector(AbstractConnector):
                 password=self.password,
                 dsn=dsn
             )
+
             return self.conn
         except oracledb.DatabaseError as e:
             print(f"Oracle 데이터베이스 연결 오류: {e}")

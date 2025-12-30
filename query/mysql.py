@@ -4,13 +4,13 @@ def select_columns_info_query():
         COLUMN_COMMENT                컬럼 설명
         ORDINAL_POSITION              시각적 순서
         DATA_TYPE                     데이터 타입
-        UDT_NAME                      PostgreSQL 고유 타입 명
+        UDT_NAME                      MySQL 고유 타입 명
         CHARACTER_MAXIMUM_LENGTH      문자열의 최대 길이
         NUMERIC_PRECISION             숫자형 데이터의 전체 자릿수와 소수점 자릿수
         IS_NULLABLE                   NULL 허용여부
         COLUMN_DEFAULT                기본 값
         IS_IDENTITY                   자동 증가하는 pk인지 여부
-        IS_GENERATED                  계산된 컬럼(Generated Column) 여부
+        IS_GENERATED                  계산된 컬럼 여부
         COLLATION_NAME                문자열 정렬 규칙
         DATETIME_PRECISION            타임스탬프의 밀리초 정밀도
         IS_PK                         PK 여부

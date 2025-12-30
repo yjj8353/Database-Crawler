@@ -5,6 +5,7 @@ from connector.oracle import OracleConnector
 from connector.mysql import MysqlConnector
 from connector.postgresql import PostgreSQLConnector
 from crawler.mysql import MySQLCrawler
+from crawler.oracle import OracleCrawler
 from crawler.postgresql import PostgreSQLCrawler
 
 
@@ -26,6 +27,8 @@ def connect():
             connector = PostgreSQLConnector(database, username, password, host, int(port))
         elif vendor == "mysql":
             connector = MysqlConnector(database, username, password, host, int(port))
+        elif vendor == "oracle":
+            connector = OracleConnector(database, username, password, host, int(port))
 
         if connector is not None:
             conn = connector.connect()
@@ -39,6 +42,8 @@ def connect():
             crawler = PostgreSQLCrawler(connector, ["public"])
         elif vendor == "mysql":
             crawler = MySQLCrawler(connector, database)
+        elif vendor == "oracle":
+            crawler = OracleCrawler(connector, database)
 
         crawler.crawling()
 

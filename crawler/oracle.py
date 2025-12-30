@@ -1,11 +1,11 @@
 from crawler import AbstractCrawler
 from data.column import Column
 
-from query import mysql as my
+from query import oracle as ora
 from data.table import Table
 
 
-class MySQLCrawler(AbstractCrawler):
+class OracleCrawler(AbstractCrawler):
     def __init__(self, connector, schema):
         super().__init__(connector)
         self.schema = schema
@@ -20,22 +20,24 @@ class MySQLCrawler(AbstractCrawler):
 
     def get_tables(self):
         query = """
-            SELECT TABLE_NAME
-                 , TABLE_COMMENT
-              FROM INFORMATION_SCHEMA.TABLES
-             WHERE TABLE_SCHEMA = DATABASE()
-               AND TABLE_TYPE = 'BASE TABLE'
-             ORDER BY TABLE_NAME;
+            SELECT UT.TABLE_NAME
+                 , NVL(UTC.COMMENTS, '') AS TABLE_COMMENT
+            FROM USER_TABLES UT
+            LEFT OUTER JOIN USER_TAB_COMMENTS UTC
+              ON UT.TABLE_NAME = UTC.TABLE_NAME
+            ORDER BY UT.TABLE_NAME
         """
 
         conn = self.connector.connect()
         try:
             tables: list[Table] = []
-            with conn.cursor(dictionary = True) as cur:
+            with conn.cursor() as cur:
                 cur.execute(query)
+                cols = [desc[0] for desc in cur.description]
                 rows = cur.fetchall()
                 for row in rows:
-                    table = Table(row)
+                    row_dict = dict(zip(cols, row))
+                    table = Table(row_dict)
                     tables.append(table)
         finally:
             conn.close()
@@ -48,11 +50,13 @@ class MySQLCrawler(AbstractCrawler):
 
         conn = self.connector.connect()
         try:
-            with conn.cursor(dictionary = True) as cur:
-                cur.execute(my.select_columns_info_query(), (self.schema, table.table_name, self.schema, table.table_name))
+            with conn.cursor() as cur:
+                cur.execute(ora.select_columns_info_query(), { "owner": self.schema, "table_name": table.table_name })
+                cols = [d[0] for d in cur.description] if cur.description else []
                 rows = cur.fetchall()
                 for row in rows:
-                    column = Column(row)
+                    row_dict = dict(zip(cols, row))
+                    column = Column(row_dict)
                     columns.append(column)
 
         except Exception as e:
