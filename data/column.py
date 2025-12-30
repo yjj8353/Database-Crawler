@@ -49,3 +49,90 @@ class Column:
         self.__pk_constraint_name = row["PK_CONSTRAINT_NAME"]
         self.__fk_constraint_name = row["FK_CONSTRAINT_NAME"]
 
+    @property
+    def column_name(self) -> str:
+        return self.__column_name
+
+    @property
+    def column_comment(self) -> Optional[str]:
+        return self.__column_comment
+
+    @property
+    def ordinal_position(self) -> int:
+        return self.__ordinal_position
+
+    @property
+    def data_type(self) -> str:
+        return self.__data_type
+
+    @property
+    def udt_name(self) -> str:
+        return self.__udt_name
+
+    @property
+    def character_maximum_length(self) -> Optional[int]:
+        return self.__character_maximum_length
+
+    @property
+    def numeric_precision(self) -> Optional[int]:
+        return self.__numeric_precision
+
+    @property
+    def is_nullable(self) -> str:
+        return self.__is_nullable
+
+    @property
+    def column_default(self) -> Optional[str]:
+        return self.__column_default
+
+    @property
+    def is_identity(self) -> bool:
+        return self.__is_identity
+
+    @property
+    def is_generated(self) -> bool:
+        return self.__is_generated
+
+    @property
+    def collation_name(self) -> Optional[str]:
+        return self.__collation_name
+
+    @property
+    def datetime_precision(self) -> Optional[int]:
+        return self.__datetime_precision
+
+    @property
+    def is_pk(self) -> bool:
+        return self.__is_pk
+
+    @property
+    def is_fk(self) -> bool:
+        return self.__is_fk
+
+    @property
+    def foreign_table_schema(self) -> Optional[str]:
+        return self.__foreign_table_schema
+
+    @property
+    def foreign_table_name(self) -> Optional[str]:
+        return self.__foreign_table_name
+
+    @property
+    def foreign_column_name(self) -> Optional[str]:
+        return self.__foreign_column_name
+
+    @property
+    def update_rule(self) -> Optional[str]:
+        return self.__update_rule
+
+    @property
+    def delete_rule(self) -> Optional[str]:
+        return self.__delete_rule
+
+    @property
+    def pk_constraint_name(self) -> Optional[str]:
+        return self.__pk_constraint_name
+
+    @property
+    def fk_constraint_name(self) -> Optional[str]:
+        return self.__fk_constraint_name

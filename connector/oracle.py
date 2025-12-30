@@ -1,3 +1,4 @@
+from typing import Optional
 import oracledb
 
 from connector import AbstractConnector
@@ -5,7 +6,7 @@ from connector import AbstractConnector
 
 class OracleConnector(AbstractConnector):
     service_name: str = "orcl"
-    sid: str = None
+    sid: Optional[str] = None
 
     def __init__(self, database, username, password, host="localhost", port=1521):
         super().__init__(database, username, password, host, port)
