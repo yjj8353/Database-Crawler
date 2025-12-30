@@ -10,7 +10,7 @@ services:
       - "15432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      # - ./db/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql:ro
+      - ./db/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U example_user -d example_db"]
       interval: 10s
@@ -29,7 +29,7 @@ services:
       - "13306:3306"
     volumes:
       - mysqldata:/var/lib/mysql
-      # - ./db/init-mysql.sql:/docker-entrypoint-initdb.d/init-mysql.sql:ro
+      - ./db/init-mysql.sql:/docker-entrypoint-initdb.d/init-mysql.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -uroot -proot_pass"]
       interval: 10s

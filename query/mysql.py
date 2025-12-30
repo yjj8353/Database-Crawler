@@ -49,10 +49,76 @@ def select_fk_query() -> str:
                 ON tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME
                AND tc.TABLE_SCHEMA    = kcu.TABLE_SCHEMA
                AND tc.TABLE_NAME      = kcu.TABLE_NAME
-             LEFT JOIN information_schema.REFERENTIAL_CONSTRAINTS rc
-                ON rc.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+              LEFT OUTER JOIN information_schema.REFERENTIAL_CONSTRAINTS rc
+                ON rc.CONSTRAINT_NAME   = tc.CONSTRAINT_NAME
                AND rc.CONSTRAINT_SCHEMA = tc.TABLE_SCHEMA
-             WHERE tc.CONSTRAINT_TYPE = 'FOREIGN KEY'
-               AND tc.TABLE_NAME      = %s
+             WHERE tc.CONSTRAINT_TYPE   = 'FOREIGN KEY'
+               AND tc.TABLE_NAME        = %s
              ORDER BY tc.CONSTRAINT_NAME, kcu.ORDINAL_POSITION;
             """
+
+
+def select_columns_info_query():
+    return """
+        WITH TABLE_CONSTRAINTS AS (
+            SELECT KCU.COLUMN_NAME
+                 , TC.CONSTRAINT_TYPE
+                 , KCU.REFERENCED_TABLE_SCHEMA
+                 , KCU.REFERENCED_TABLE_NAME
+                 , KCU.REFERENCED_COLUMN_NAME
+                 , RC.UPDATE_RULE
+                 , RC.DELETE_RULE
+                 , RC.CONSTRAINT_NAME AS FK_CONSTRAINT_NAME
+                 , TC.CONSTRAINT_NAME AS PK_CONSTRAINT_NAME
+            FROM information_schema.TABLE_CONSTRAINTS TC
+           INNER JOIN information_schema.KEY_COLUMN_USAGE KCU
+              ON TC.TABLE_SCHEMA    = %s
+             AND TC.TABLE_NAME      = %s
+             AND TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME
+            LEFT OUTER JOIN information_schema.REFERENTIAL_CONSTRAINTS RC
+              ON TC.TABLE_SCHEMA    = RC.CONSTRAINT_SCHEMA
+             AND TC.TABLE_NAME      = RC.TABLE_NAME
+             AND TC.CONSTRAINT_NAME = RC.CONSTRAINT_NAME
+        )
+        SELECT C.COLUMN_NAME
+             , C.COLUMN_COMMENT
+             , C.ORDINAL_POSITION
+             , C.DATA_TYPE
+             , C.COLUMN_TYPE AS udt_name
+             , C.CHARACTER_MAXIMUM_LENGTH
+             , C.NUMERIC_PRECISION
+             , C.IS_NULLABLE
+             , C.COLUMN_DEFAULT
+             , CASE WHEN C.EXTRA LIKE '%auto_increment%' THEN 'T' ELSE 'F' END AS IS_IDENTITY
+             , CASE WHEN C.GENERATION_EXPRESSION IS NOT NULL AND C.GENERATION_EXPRESSION <> '' THEN 'T' ELSE 'F' END AS IS_GENERATED
+             , C.COLLATION_NAME
+             , C.DATETIME_PRECISION
+             , MAX(CASE WHEN TC.CONSTRAINT_TYPE = 'PRIMARY KEY' THEN 'T' ELSE 'F' END) AS IS_PK
+             , MAX(CASE WHEN TC.CONSTRAINT_TYPE = 'FOREIGN KEY' THEN 'T' ELSE 'F' END) AS IS_FK
+             , MAX(TC.REFERENCED_TABLE_SCHEMA) AS FOREIGN_TABLE_SCHEMA
+             , MAX(TC.REFERENCED_TABLE_NAME) AS FOREIGN_TABLE_NAME
+             , MAX(TC.REFERENCED_COLUMN_NAME) AS FOREIGN_COLUMN_NAME
+             , MAX(TC.UPDATE_RULE) AS UPDATE_RULE
+             , MAX(TC.DELETE_RULE) AS DELETE_RULE
+             , MAX(TC.FK_CONSTRAINT_NAME) AS FK_CONSTRAINT_NAME
+             , MAX(TC.PK_CONSTRAINT_NAME) AS PK_CONSTRAINT_NAME
+        FROM information_schema.COLUMNS C
+        LEFT JOIN TABLE_CONSTRAINTS TC 
+          ON C.COLUMN_NAME = TC.COLUMN_NAME
+        WHERE C.TABLE_SCHEMA = %s
+          AND C.TABLE_NAME   = %s
+        GROUP BY C.COLUMN_NAME
+            , C.COLUMN_COMMENT
+            , C.ORDINAL_POSITION
+            , C.DATA_TYPE
+            , C.COLUMN_TYPE
+            , C.CHARACTER_MAXIMUM_LENGTH
+            , C.NUMERIC_PRECISION
+            , C.IS_NULLABLE
+            , C.COLUMN_DEFAULT
+            , C.EXTRA
+            , C.GENERATION_EXPRESSION 
+            , C.COLLATION_NAME 
+            , C.DATETIME_PRECISION
+        ORDER BY C.ORDINAL_POSITION;
+    """

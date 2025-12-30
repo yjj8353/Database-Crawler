@@ -38,7 +38,7 @@ def connect():
         if vendor == "postgresql":
             crawler = PostgreSQLCrawler(connector, ["public"])
         elif vendor == "mysql":
-            crawler = MySQLCrawler(connector)
+            crawler = MySQLCrawler(connector, database)
 
         crawler.crawling()
 
@@ -50,6 +50,5 @@ def connect():
             conn.close()
 
 
-# 스크립트를 실행하려면 여백의 녹색 버튼을 누릅니다.
 if __name__ == '__main__':
     connect()

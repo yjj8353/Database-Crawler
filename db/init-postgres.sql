@@ -1,0 +1,105 @@
+-- CREATE TABLE
+
+CREATE TABLE "AUTHORITIES" (
+    "AUTHORITY_CODE"   VARCHAR(50)   NOT NULL,
+    "AUTHORITY_NAME"   VARCHAR(100)  NOT NULL,
+    "DESCRIPTION"      VARCHAR(255),
+    "USE_YN"           CHAR(1)       DEFAULT 'Y',
+    "USE_START_DATE"   DATE,
+    "USE_END_DATE"     DATE,
+    "CREATED_DATE"     TIMESTAMP     DEFAULT NOW(),
+    "CREATED_ID"       VARCHAR(50),
+    "MODIFIED_DATE"    TIMESTAMP     DEFAULT NOW(),
+    "MODIFIED_ID"      VARCHAR(50),
+    CONSTRAINT "PK_AUTHORITIES" PRIMARY KEY ("AUTHORITY_CODE")
+);
+
+CREATE TABLE "CODE_GROUPS" (
+    "GROUP_CODE"       VARCHAR(50)   NOT NULL,
+    "GROUP_NAME"       VARCHAR(100)  NOT NULL,
+    "GROUP_EXPLANATION" VARCHAR(255),
+    "USE_YN"           CHAR(1)       DEFAULT 'Y',
+    "USE_START_DATE"   DATE,
+    "USE_END_DATE"     DATE,
+    "VERSION"          INTEGER       DEFAULT 0,
+    "CREATED_DATE"     TIMESTAMP     DEFAULT NOW(),
+    "CREATED_ID"       VARCHAR(50),
+    "MODIFIED_DATE"    TIMESTAMP     DEFAULT NOW(),
+    "MODIFIED_ID"      VARCHAR(50),
+    CONSTRAINT "PK_CODE_GROUPS" PRIMARY KEY ("GROUP_CODE")
+);
+
+CREATE TABLE "CODES" (
+    "GROUP_CODE"       VARCHAR(50)   NOT NULL,
+    "CODE"             VARCHAR(50)   NOT NULL,
+    "CODE_NAME"        VARCHAR(100)  NOT NULL,
+    "CODE_EXPLANATION" VARCHAR(255),
+    "USE_YN"           CHAR(1)       DEFAULT 'Y',
+    "USE_START_DATE"   DATE,
+    "USE_END_DATE"     DATE,
+    "VERSION"          INTEGER       DEFAULT 0,
+    "CREATED_DATE"     TIMESTAMP     DEFAULT NOW(),
+    "CREATED_ID"       VARCHAR(50),
+    "MODIFIED_DATE"    TIMESTAMP     DEFAULT NOW(),
+    "MODIFIED_ID"      VARCHAR(50),
+    CONSTRAINT "PK_CODES" PRIMARY KEY ("GROUP_CODE", "CODE"),
+    CONSTRAINT "FK_CODES_GROUP" FOREIGN KEY ("GROUP_CODE") REFERENCES "CODE_GROUPS"("GROUP_CODE")
+);
+
+-- 권한 데이터 생성
+
+INSERT INTO "AUTHORITIES" (
+      "CREATED_DATE"
+    , "CREATED_ID"
+    , "MODIFIED_DATE"
+    , "MODIFIED_ID"
+    , "AUTHORITY_CODE"
+    , "AUTHORITY_NAME"
+    , "DESCRIPTION"
+    , "USE_YN"
+    , "USE_START_DATE"
+    , "USE_END_DATE"
+) VALUES (NOW(), 'System', NOW(), 'System', 'ROLE_ADMIN', '관리자', '관리자 권한', 'Y', TO_DATE('19000101', 'YYYYMMDD'), TO_DATE('99991231', 'YYYYMMDD'))
+       , (NOW(), 'System', NOW(), 'System', 'ROLE_MANAGER', '매니저', '관리자 대행 권한', 'Y', TO_DATE('19000101', 'YYYYMMDD'), TO_DATE('99991231', 'YYYYMMDD'))
+       , (NOW(), 'System', NOW(), 'System', 'ROLE_DB_ENGINEER', 'DB 엔지니어', 'DB 엔지니어 권한', 'Y', TO_DATE('19000101', 'YYYYMMDD'), TO_DATE('99991231', 'YYYYMMDD'))
+       , (NOW(), 'System', NOW(), 'System', 'ROLE_GUEST', '게스트', '초기 사용자 권한', 'Y', TO_DATE('19000101', 'YYYYMMDD'), TO_DATE('99991231', 'YYYYMMDD'))
+       ;
+
+-- 공통코드그룹 데이터 생성
+
+INSERT INTO "CODE_GROUPS" (
+      "CREATED_DATE"
+    , "CREATED_ID"
+    , "MODIFIED_DATE"
+    , "MODIFIED_ID"
+    , "GROUP_CODE"
+    , "GROUP_NAME"
+    , "GROUP_EXPLANATION"
+    , "USE_YN"
+    , "USE_START_DATE"
+    , "USE_END_DATE"
+    , "VERSION"
+) VALUES (NOW(), 'System', NOW(), 'System', 'COMMON_CODE_01', '공통코드_01', '공통코드_01 설명', 'Y', TO_DATE('19000101', 'YYYYMMDD'), TO_DATE('99991231', 'YYYYMMDD'), 0)
+       , (NOW(), 'System', NOW(), 'System', 'COMMON_CODE_02', '공통코드_02', '공통코드_02 설명', 'Y', TO_DATE('19000101', 'YYYYMMDD'), TO_DATE('99991231', 'YYYYMMDD'), 0)
+       , (NOW(), 'System', NOW(), 'System', 'COMMON_CODE_03', '공통코드_03', '공통코드_03 설명', 'Y', TO_DATE('19000101', 'YYYYMMDD'), TO_DATE('99991231', 'YYYYMMDD'), 0)
+       ;
+
+-- 공통코드 데이터 생성
+
+INSERT INTO "CODES" (
+      "GROUP_CODE"
+    , "CREATED_DATE"
+    , "CREATED_ID"
+    , "MODIFIED_DATE"
+    , "MODIFIED_ID"
+    , "CODE"
+    , "CODE_NAME"
+    , "CODE_EXPLANATION"
+    , "USE_YN"
+    , "USE_START_DATE"
+    , "USE_END_DATE"
+    , "VERSION"
+) VALUES ('COMMON_CODE_01', NOW(), 'System', NOW(), 'System', 'CODE_01', '코드_01', '코드_01 설명', 'Y', TO_DATE('19000101', 'YYYYMMDD'), TO_DATE('99991231', 'YYYYMMDD'), 0)
+       , ('COMMON_CODE_01', NOW(), 'System', NOW(), 'System', 'CODE_02', '코드_02', '코드_02 설명', 'Y', TO_DATE('19000101', 'YYYYMMDD'), TO_DATE('99991231', 'YYYYMMDD'), 0)
+       , ('COMMON_CODE_01', NOW(), 'System', NOW(), 'System', 'CODE_03', '코드_03', '코드_03 설명', 'Y', TO_DATE('19000101', 'YYYYMMDD'), TO_DATE('99991231', 'YYYYMMDD'), 0)
+       ;
